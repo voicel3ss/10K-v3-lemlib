@@ -14,7 +14,7 @@ lemlib::Drivetrain drivetrain(&left_motors, // left motor group
 
 pros::Imu imu(21);
 pros::Rotation horizontal_encoder(-3);
-lemlib::TrackingWheel horizontal_tracking_wheel(&horizontal_encoder, lemlib::Omniwheel::NEW_275, -4.45);
+lemlib::TrackingWheel horizontal_tracking_wheel(&horizontal_encoder, lemlib::Omniwheel::NEW_2, -4.45);
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
@@ -62,7 +62,6 @@ lemlib::Chassis chassis(drivetrain, // drivetrain settings
 pros::Motor intake(2);
 pros::Motor lever(20);
 
-// TOOD: fix pistons
 pros::adi::DigitalOut blocker('D');
 pros::adi::DigitalOut lift('G');
 pros::adi::DigitalOut matchloader('H');
@@ -196,17 +195,6 @@ void controls() {
   }
 }
 
-void controller_update(){
-  while (true) {
-    master.clear();
-    master.print(0, 0, "Battery%: %d%%", master.get_battery_capacity());
-    master.print(1, 0, "Intake: %dC", intake.get_temperature());
-    master.print(2, 0, "Lever: %dC", lever.get_temperature());
-    master.print(3, 0, "DriveL: %dC", left_motors.get_temperature());
-    master.print(4, 0, "DriveR: %dC", right_motors.get_temperature());
-    pros::delay(1000);
-  }
-}
 
 void initialize() {
     pros::lcd::initialize(); // initialize brain screen
@@ -219,10 +207,11 @@ void initialize() {
             pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
             pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
             // delay to save resources
-            pros::delay(20);
+            pros::delay(80);
         }
     });
 }
+
 void disabled() {
   // . . .
 }
