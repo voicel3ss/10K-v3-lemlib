@@ -315,31 +315,33 @@ void right_starter(){
   chassis.moveToPoint(24, 24, 700, {.earlyExitRange = 3});
   pros::delay(400);
   matchloader.set_value(true);
-  chassis.moveToPoint(14, 47.5, 800);
+  chassis.moveToPoint(14, 47.5, 900);
   pros::delay(50);
   matchloader.set_value(false);
   pros::delay(300);
   matchloader.set_value(true);
   pros::delay(200);
-  chassis.swingToPoint(40, 47, lemlib::DriveSide::RIGHT, 700, {.forwards = false});
+  chassis.swingToPoint(40, 47, lemlib::DriveSide::RIGHT, 800, {.forwards = false});
   chassis.moveToPoint(40, 47, 200, {.forwards = false});
   chassis.swingToHeading(90, lemlib::DriveSide::RIGHT, 1000, {});
   pros::delay(750);
   pros::Task scoreTask(score);
   chassis.waitUntilDone();
   chassis.tank(-127, -127);
-  matchloader.set_value(false);
 }
 
 void six_ball_right()
 {
+  matchloader.set_value(false);
   right_starter();
-  chassis.setPose(27, 47, 90);
-  chassis.turnToPoint(33, 58, 300);
-  chassis.moveToPoint(33, 58, 500);
+  pros::delay(400);
+  //chassis.setPose(27, 47, 90);
+  chassis.turnToPoint(28, 61, 300);
+  chassis.moveToPoint(28, 61, 500);
   wing.set_value(false);
   chassis.turnToHeading(90, 400);
-  chassis.moveToPoint(10, 58, 20000, {.forwards = false});
+  chassis.moveToPoint(6, 57.5, 2000, {.forwards = false});
+  chassis.turnToHeading(130, 400);
 }
 
 void six_ball_left()
@@ -349,6 +351,18 @@ void six_ball_left()
 void nine_ball_right()
 {
   right_starter();
+  matchloader.set_value(true);
+  pros::delay(400);
+  chassis.moveToPoint(45, 50.5, 1700, {.maxSpeed=55}, false);
+  chassis.tank(40, 40);
+  pros::delay(700);
+  chassis.moveToPoint(43, 50.5, 1200, {.forwards = false});
+  chassis.turnToPoint(0, 5.5, 500);
+  matchloader.set_value(false);
+  chassis.moveToPoint(0, 5.5, 2000, {}, false);
+  intake.move(-80);
+  chassis.tank(40, 40);
+  //TODO: tune and add wing
 }
 
 void nine_ball_left()
