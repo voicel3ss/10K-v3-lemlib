@@ -94,7 +94,7 @@ const char *autonToString(Auton auton)
 
 std::unordered_map<int, Auton> autonMap = createAutonMap();
 
-int autonCount = 1;
+int autonCount = 2;
 
 void on_left_button()
 {
@@ -312,18 +312,18 @@ void right_starter(){
   wing.set_value(true);
   intake.move(127);
   chassis.setPose(45, 6, 270);
-  chassis.moveToPoint(24, 24, 700, {.earlyExitRange = 3});
+  chassis.moveToPoint(24, 24, 750, {.earlyExitRange = 3});
   pros::delay(400);
   matchloader.set_value(true);
-  chassis.moveToPoint(14, 47.5, 900);
+  chassis.moveToPoint(11, 47.5, 1000);
   pros::delay(50);
   matchloader.set_value(false);
   pros::delay(300);
   matchloader.set_value(true);
   pros::delay(200);
-  chassis.swingToPoint(40, 47, lemlib::DriveSide::RIGHT, 800, {.forwards = false});
-  chassis.moveToPoint(40, 47, 200, {.forwards = false});
-  chassis.swingToHeading(90, lemlib::DriveSide::RIGHT, 1000, {});
+  chassis.swingToPoint(40, 46, lemlib::DriveSide::RIGHT, 800, {.forwards = false, .earlyExitRange=5});
+  chassis.moveToPoint(40, 46, 200, {.forwards = false});
+  chassis.swingToHeading(90, lemlib::DriveSide::RIGHT, 900, {});
   pros::delay(750);
   pros::Task scoreTask(score);
   chassis.waitUntilDone();
@@ -332,16 +332,17 @@ void right_starter(){
 
 void six_ball_right()
 {
-  matchloader.set_value(false);
   right_starter();
+  matchloader.set_value(false);
   pros::delay(400);
-  //chassis.setPose(27, 47, 90);
-  chassis.turnToPoint(28, 61, 300);
-  chassis.moveToPoint(28, 61, 500);
+  chassis.setPose(27, 47, 90);
+  chassis.turnToPoint(32, 57, 300);
+  chassis.moveToPoint(32, 57, 500);
   wing.set_value(false);
   chassis.turnToHeading(90, 400);
-  chassis.moveToPoint(6, 57.5, 2000, {.forwards = false});
+  chassis.moveToPoint(11, 55, 2000, {.forwards = false});
   chassis.turnToHeading(130, 400);
+  chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
 }
 
 void six_ball_left()
@@ -351,18 +352,29 @@ void six_ball_left()
 void nine_ball_right()
 {
   right_starter();
-  matchloader.set_value(true);
   pros::delay(400);
-  chassis.moveToPoint(45, 50.5, 1700, {.maxSpeed=55}, false);
+  chassis.setPose(27, 47, 90);
+  matchloader.set_value(true);
+  intake.move(127);
+  pros::delay(400);
+  chassis.moveToPoint(55, 47, 1700, {.maxSpeed=55}, false);
   chassis.tank(40, 40);
   pros::delay(700);
-  chassis.moveToPoint(43, 50.5, 1200, {.forwards = false});
-  chassis.turnToPoint(0, 5.5, 500);
+  chassis.moveToPoint(43, 47, 1200, {.forwards = false});
+  chassis.turnToPoint(-2, 5.5, 500);
   matchloader.set_value(false);
-  chassis.moveToPoint(0, 5.5, 2000, {}, false);
-  intake.move(-80);
+  chassis.moveToPose(-2, 5.5, 235, 2800, {.horizontalDrift = 8, .lead = 0.3}, false);
+  intake.move(-40);
   chassis.tank(40, 40);
-  //TODO: tune and add wing
+  pros::delay(2200);
+  chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
+  chassis.moveToPoint(32, 62, 3500, {.forwards = false});
+  wing.set_value(false);
+  chassis.turnToHeading(110, 1000);
+  chassis.moveToPoint(11, 62, 2000, {.forwards = false});
+  chassis.turnToHeading(130, 400);
+  chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+  //TODO: fix wing
 }
 
 void nine_ball_left()
@@ -396,7 +408,7 @@ void autonomous()
 void opcontrol()
 {
   pros::Task controlTask(controls);
-
+  chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
   while (true)
   {
     int leftY = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
