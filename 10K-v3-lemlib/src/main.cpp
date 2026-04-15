@@ -59,8 +59,8 @@ lemlib::Chassis chassis(drivetrain,         // drivetrain settings
 
 enum class Auton
 {
-  Left6,
   Left9,
+  Left6,
   Right6,
   Right9,
 };
@@ -94,7 +94,7 @@ const char *autonToString(Auton auton)
 
 std::unordered_map<int, Auton> autonMap = createAutonMap();
 
-int autonCount = 2;
+int autonCount = 1;
 
 void on_left_button()
 {
@@ -122,38 +122,70 @@ pros::adi::DigitalOut lift('G');
 pros::adi::DigitalOut matchloader('H');
 pros::adi::DigitalOut wing('C');
 
-bool drive_arcade = false;
+bool drive_arcade = true;
 bool intake_toggle = false;
 bool reverse_toggle = false;
 bool lift_toggle = false;
 bool wing_toggle = false;
 bool matchloader_toggle = false;
 bool start_down = false;
+bool score_intake_toggle = false;
 
 void score()
 {
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   if (!lift_toggle)
   {
-    intake.move(127);
-    intake_toggle = true;
+    intake.move(-50);
+    score_intake_toggle = true;
     lever.move(127);
     blocker.set_value(true);
     pros::delay(1000);
     lever.move(-127);
-    intake_toggle = false;
+    score_intake_toggle = false;
     pros::delay(1000);
     lever.move_velocity(0);
   }
   else
   {
-    intake.move(127);
-    intake_toggle = true;
+    intake.move(-50);
+    score_intake_toggle = true;
     lever.move_velocity(70);
     blocker.set_value(true);
     pros::delay(1200);
     lever.move(-127);
-    intake_toggle = false;
+    score_intake_toggle = false;
+    pros::delay(400);
+    lever.move_velocity(0);
+  }
+  lever.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+}
+
+void score_three()
+{
+  lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  if (!lift_toggle)
+  {
+    intake.move(-50);
+    score_intake_toggle = true;
+    //lever.move(127);
+    lever.move_relative(500, 127);
+    blocker.set_value(true);
+    pros::delay(700);
+    lever.move(-127);
+    score_intake_toggle = false;
+    pros::delay(1000);
+    lever.move_velocity(0);
+  }
+  else
+  {
+    intake.move(-50);
+    score_intake_toggle = true;
+    lever.move_velocity(70);
+    blocker.set_value(true);
+    pros::delay(300);
+    lever.move(-127);
+    score_intake_toggle = false;
     pros::delay(400);
     lever.move_velocity(0);
   }
@@ -165,8 +197,8 @@ void score_driver()
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   if (!lift_toggle)
   {
-    intake.move(127);
-    intake_toggle = true;
+    intake.move(-50);
+    score_intake_toggle = true;
     lever.move(127);
     blocker.set_value(true);
     pros::delay(1000);
@@ -175,14 +207,14 @@ void score_driver()
       pros::delay(20);
     }
     lever.move(-127);
-    intake_toggle = false;
+    score_intake_toggle = false;
     pros::delay(400);
     lever.move_velocity(0);
   }
   else
   {
-    intake.move(127);
-    intake_toggle = true;
+    intake.move(-50);
+    score_intake_toggle = true;
     lever.move_velocity(100);
     blocker.set_value(true);
     pros::delay(1200);
@@ -191,7 +223,7 @@ void score_driver()
       pros::delay(20);
     }
     lever.move(-127);
-    intake_toggle = false;
+    score_intake_toggle = false;
     pros::delay(1000);
     lever.move_velocity(0);
   }
@@ -274,6 +306,11 @@ void controls()
     {
       pros::Task score_task(score_driver);
     }
+
+    if (master.get_digital_new_press(DIGITAL_B))
+    {
+      pros::Task score_task(score_three);
+    }
     pros::delay(20);
   }
 }
@@ -315,19 +352,42 @@ void right_starter(){
   chassis.moveToPoint(24, 24, 750, {.earlyExitRange = 3});
   pros::delay(400);
   matchloader.set_value(true);
-  chassis.moveToPoint(11, 47.5, 1000);
+  chassis.moveToPoint(10, 48.5, 1000);
   pros::delay(50);
   matchloader.set_value(false);
   pros::delay(300);
   matchloader.set_value(true);
   pros::delay(200);
   chassis.swingToPoint(40, 46, lemlib::DriveSide::RIGHT, 800, {.forwards = false, .earlyExitRange=5});
-  chassis.moveToPoint(40, 46, 200, {.forwards = false});
-  chassis.swingToHeading(90, lemlib::DriveSide::RIGHT, 900, {});
-  pros::delay(750);
+  chassis.moveToPoint(40, 46, 250, {.forwards = false});
+  chassis.swingToHeading(90, lemlib::DriveSide::RIGHT, 1100, {});
+  pros::delay(800);
   pros::Task scoreTask(score);
   chassis.waitUntilDone();
   chassis.tank(-127, -127);
+}
+void left_starter(){
+  wing.set_value(true);
+  intake.move(127);
+  chassis.setPose(45, -6, 270);
+  chassis.moveToPoint(24, -24, 750, {.earlyExitRange = 3});
+  pros::delay(400);
+  matchloader.set_value(true);
+  chassis.moveToPoint(13, -49, 1000);
+  pros::delay(50);
+  matchloader.set_value(false);
+  pros::delay(300);
+  matchloader.set_value(true);
+  
+  pros::delay(200);
+  chassis.swingToPoint(42, -46, lemlib::DriveSide::LEFT, 800, {.forwards = false, .earlyExitRange=5});
+  chassis.moveToPoint(42, -46, 250, {.forwards = false});
+  chassis.swingToHeading(90, lemlib::DriveSide::LEFT, 1100, {});
+  pros::delay(800);
+  pros::Task scoreTask(score);
+  chassis.waitUntilDone();
+  chassis.tank(-127, -127);
+  
 }
 
 void six_ball_right()
@@ -335,7 +395,7 @@ void six_ball_right()
   right_starter();
   matchloader.set_value(false);
   pros::delay(400);
-  chassis.setPose(27, 47, 90);
+  chassis.setPose(27, 47, chassis.getPose().theta);
   chassis.turnToPoint(32, 57, 300);
   chassis.moveToPoint(32, 57, 500);
   wing.set_value(false);
@@ -343,42 +403,74 @@ void six_ball_right()
   chassis.moveToPoint(11, 55, 2000, {.forwards = false});
   chassis.turnToHeading(130, 400);
   chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+  start_down = true;
 }
 
 void six_ball_left()
 {
+  left_starter();
+  matchloader.set_value(false);
+  pros::delay(400);
+  chassis.setPose(27, 47, chassis.getPose().theta);
+  chassis.turnToPoint(32, 57, 300);
+  chassis.moveToPoint(32, 57, 500);
+  wing.set_value(false);
+  chassis.turnToHeading(90, 400);
+  chassis.moveToPoint(11, 55, 2000, {.forwards = false});
+  chassis.turnToHeading(130, 400);
+  chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+  start_down = true;
 }
 
 void nine_ball_right()
 {
   right_starter();
-  pros::delay(400);
-  chassis.setPose(27, 47, 90);
+  pros::delay(800);
+  chassis.setPose(27, 47, chassis.getPose().theta);
   matchloader.set_value(true);
   intake.move(127);
   pros::delay(400);
-  chassis.moveToPoint(55, 47, 1700, {.maxSpeed=55}, false);
-  chassis.tank(40, 40);
-  pros::delay(700);
-  chassis.moveToPoint(43, 47, 1200, {.forwards = false});
-  chassis.turnToPoint(-2, 5.5, 500);
+  chassis.moveToPoint(55, 46, 1700, {.maxSpeed=55}, false);
+  chassis.tank(25, 25);
+  pros::delay(100);
+  chassis.moveToPoint(38, 46, 1200, {.forwards = false});
+  chassis.turnToPoint(-8, 5.5, 500);
   matchloader.set_value(false);
-  chassis.moveToPose(-2, 5.5, 235, 2800, {.horizontalDrift = 8, .lead = 0.3}, false);
-  intake.move(-40);
+  chassis.moveToPose(-3, 5.5, 235, 2800, {.horizontalDrift = 8, .lead = 0.3}, false);
+  intake.move(-70);
   chassis.tank(40, 40);
   pros::delay(2200);
-  chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
-  chassis.moveToPoint(32, 62, 3500, {.forwards = false});
-  wing.set_value(false);
-  chassis.turnToHeading(110, 1000);
-  chassis.moveToPoint(11, 62, 2000, {.forwards = false});
-  chassis.turnToHeading(130, 400);
-  chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+  // chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
+  // chassis.moveToPoint(26, 20, 1000, {.forwards = false});
+  // wing.set_value(false);
+  // chassis.turnToHeading(275, 1000);
+  // chassis.moveToPoint(-10, 26, 2000, {});
+  // chassis.turnToHeading(240, 400);
+  // chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+  start_down = true;
   //TODO: fix wing
 }
 
 void nine_ball_left()
 {
+  left_starter();
+  pros::delay(800);
+  chassis.setPose(27, -47, chassis.getPose().theta);
+  matchloader.set_value(true);
+  intake.move(127);
+  pros::delay(400);
+  chassis.moveToPoint(55, -46, 1700, {.maxSpeed=55}, false);
+  chassis.tank(25, 25);
+  pros::delay(100);
+  chassis.moveToPoint(38, -46, 1200, {.forwards = false});
+  chassis.turnToPoint(0, -5, 500, {.forwards = false});
+  matchloader.set_value(false);
+  lift.set_value(true);
+  lift_toggle = true;
+  chassis.moveToPose(0, -5, 305, 2800, {.forwards = false, .horizontalDrift = 8, .lead = 0.3}, false);
+  pros::Task scoreMidTask(score);
+  chassis.tank(-20, -20);
+  pros::delay(2200);
 }
 
 void autonomous()
@@ -428,7 +520,13 @@ void opcontrol()
     {
       intake.move(127);
     }
-    else if (!reverse_toggle)
+
+    if (score_intake_toggle){
+      intake.move(-50);
+    } else if (intake_toggle && !reverse_toggle)
+    {
+      intake.move(127);
+    } else if (!reverse_toggle)
     {
       intake.move(0);
     }
