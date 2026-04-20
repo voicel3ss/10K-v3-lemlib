@@ -140,10 +140,10 @@ void score()
     score_intake_toggle = true;
     lever.move(127);
     blocker.set_value(true);
-    pros::delay(1000);
+    pros::delay(800);
     lever.move(-127);
     score_intake_toggle = false;
-    pros::delay(1000);
+    pros::delay(700);
     lever.move_velocity(0);
   }
   else
@@ -166,7 +166,7 @@ void score_three()
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   if (!lift_toggle)
   {
-    intake.move(-50);
+    intake.move(0);
     score_intake_toggle = true;
     //lever.move(127);
     lever.move_relative(500, 127);
@@ -174,12 +174,12 @@ void score_three()
     pros::delay(700);
     lever.move(-127);
     score_intake_toggle = false;
-    pros::delay(1000);
+    pros::delay(450);
     lever.move_velocity(0);
   }
   else
   {
-    intake.move(-50);
+    intake.move(0);
     score_intake_toggle = true;
     lever.move_velocity(70);
     blocker.set_value(true);
@@ -201,7 +201,7 @@ void score_driver()
     score_intake_toggle = true;
     lever.move(127);
     blocker.set_value(true);
-    pros::delay(1000);
+    pros::delay(800);
     while (master.get_digital(DIGITAL_R2))
     {
       pros::delay(20);
@@ -224,7 +224,7 @@ void score_driver()
     }
     lever.move(-127);
     score_intake_toggle = false;
-    pros::delay(1000);
+    pros::delay(600);
     lever.move_velocity(0);
   }
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
@@ -430,13 +430,14 @@ void nine_ball_right()
   matchloader.set_value(true);
   intake.move(127);
   pros::delay(400);
+  blocker.set_value(false);
   chassis.moveToPoint(55, 46, 1700, {.maxSpeed=55}, false);
   chassis.tank(25, 25);
   pros::delay(100);
   chassis.moveToPoint(38, 46, 1200, {.forwards = false});
-  chassis.turnToPoint(-8, 5.5, 500);
+  chassis.turnToPoint(-8, 5.5, 900);
   matchloader.set_value(false);
-  chassis.moveToPose(-3, 5.5, 235, 2800, {.horizontalDrift = 8, .lead = 0.3}, false);
+  chassis.moveToPose(-3, 5.5, 225, 2800, {.horizontalDrift = 8, .lead = 0.3}, false);
   intake.move(-70);
   chassis.tank(40, 40);
   pros::delay(2200);
@@ -463,7 +464,7 @@ void nine_ball_left()
   chassis.tank(25, 25);
   pros::delay(100);
   chassis.moveToPoint(38, -46, 1200, {.forwards = false});
-  chassis.turnToPoint(0, -5, 500, {.forwards = false});
+  chassis.turnToPoint(0, -5, 900, {.forwards = false});
   matchloader.set_value(false);
   lift.set_value(true);
   lift_toggle = true;
