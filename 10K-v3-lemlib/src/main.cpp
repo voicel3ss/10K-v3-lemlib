@@ -99,7 +99,7 @@ int autonCount = 1;
 void on_left_button()
 {
   autonCount += 1;
-  if (autonCount == 7)
+  if (autonCount == 5)
   {
     autonCount = 1;
   }
@@ -110,7 +110,7 @@ void on_right_button()
   autonCount -= 1;
   if (autonCount == 0)
   {
-    autonCount = 6;
+    autonCount = 4;
   }
 }
 
@@ -370,18 +370,17 @@ void left_starter(){
   wing.set_value(true);
   intake.move(127);
   chassis.setPose(45, -6, 270);
-  chassis.moveToPoint(24, -24, 750, {.earlyExitRange = 3});
+  chassis.moveToPoint(24, -24, 800, {.earlyExitRange = 1});
   pros::delay(400);
   matchloader.set_value(true);
-  chassis.moveToPoint(13, -49, 1000);
+  chassis.moveToPoint(15, -49, 1000);
   pros::delay(50);
   matchloader.set_value(false);
   pros::delay(300);
   matchloader.set_value(true);
-  
   pros::delay(200);
-  chassis.swingToPoint(42, -46, lemlib::DriveSide::LEFT, 800, {.forwards = false, .earlyExitRange=5});
-  chassis.moveToPoint(42, -46, 250, {.forwards = false});
+  chassis.swingToPoint(42, -48, lemlib::DriveSide::LEFT, 800, {.forwards = false, .earlyExitRange=5});
+  chassis.moveToPoint(42, -48, 200, {.forwards = false});
   chassis.swingToHeading(90, lemlib::DriveSide::LEFT, 1100, {});
   pros::delay(800);
   pros::Task scoreTask(score);
@@ -403,7 +402,6 @@ void six_ball_right()
   chassis.moveToPoint(11, 55, 2000, {.forwards = false});
   chassis.turnToHeading(130, 400);
   chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
-  start_down = true;
 }
 
 void six_ball_left()
@@ -419,7 +417,6 @@ void six_ball_left()
   chassis.moveToPoint(11, 55, 2000, {.forwards = false});
   chassis.turnToHeading(130, 400);
   chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
-  start_down = true;
 }
 
 void nine_ball_right()
@@ -438,9 +435,10 @@ void nine_ball_right()
   chassis.turnToPoint(-8, 5.5, 900);
   matchloader.set_value(false);
   chassis.moveToPose(-3, 5.5, 225, 2800, {.horizontalDrift = 8, .lead = 0.3}, false);
-  intake.move(-70);
+  intake.move(-60);
   chassis.tank(40, 40);
   pros::delay(2200);
+  // ? OLD WING CODE
   // chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
   // chassis.moveToPoint(26, 20, 1000, {.forwards = false});
   // wing.set_value(false);
@@ -448,8 +446,6 @@ void nine_ball_right()
   // chassis.moveToPoint(-10, 26, 2000, {});
   // chassis.turnToHeading(240, 400);
   // chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
-  start_down = true;
-  //TODO: fix wing
 }
 
 void nine_ball_left()
@@ -464,11 +460,11 @@ void nine_ball_left()
   chassis.tank(25, 25);
   pros::delay(100);
   chassis.moveToPoint(38, -46, 1200, {.forwards = false});
-  chassis.turnToPoint(0, -5, 900, {.forwards = false});
+  chassis.turnToPoint(6, -19, 900, {.forwards = false});
   matchloader.set_value(false);
   lift.set_value(true);
   lift_toggle = true;
-  chassis.moveToPose(0, -5, 305, 2800, {.forwards = false, .horizontalDrift = 8, .lead = 0.3}, false);
+  chassis.moveToPoint(3, -19, 2000, {.forwards = false}, false);
   pros::Task scoreMidTask(score);
   chassis.tank(-20, -20);
   pros::delay(2200);
@@ -514,7 +510,7 @@ void opcontrol()
 
     if (reverse_toggle)
     {
-      intake.move(-65);
+      intake.move(-55);
     }
 
     if (intake_toggle && !reverse_toggle)
