@@ -122,7 +122,7 @@ pros::adi::DigitalOut lift('G');
 pros::adi::DigitalOut matchloader('H');
 pros::adi::DigitalOut wing('C');
 
-bool drive_arcade = true;
+bool drive_arcade = false;
 bool intake_toggle = false;
 bool reverse_toggle = false;
 bool lift_toggle = false;
@@ -168,7 +168,7 @@ void score_three()
   {
     intake.move(0);
     score_intake_toggle = true;
-    //lever.move(127);
+    // lever.move(127);
     lever.move_relative(500, 127);
     blocker.set_value(true);
     pros::delay(700);
@@ -345,7 +345,8 @@ void competition_initialize()
   // . . .
 }
 
-void right_starter(){
+void right_starter()
+{
   wing.set_value(true);
   intake.move(127);
   chassis.setPose(45, 6, 270);
@@ -358,7 +359,7 @@ void right_starter(){
   pros::delay(300);
   matchloader.set_value(true);
   pros::delay(200);
-  chassis.swingToPoint(40, 46, lemlib::DriveSide::RIGHT, 800, {.forwards = false, .earlyExitRange=5});
+  chassis.swingToPoint(40, 46, lemlib::DriveSide::RIGHT, 800, {.forwards = false, .earlyExitRange = 5});
   chassis.moveToPoint(40, 46, 250, {.forwards = false});
   chassis.swingToHeading(90, lemlib::DriveSide::RIGHT, 1100, {});
   pros::delay(800);
@@ -366,7 +367,8 @@ void right_starter(){
   chassis.waitUntilDone();
   chassis.tank(-127, -127);
 }
-void left_starter(){
+void left_starter()
+{
   wing.set_value(true);
   intake.move(127);
   chassis.setPose(45, -6, 270);
@@ -379,14 +381,13 @@ void left_starter(){
   pros::delay(300);
   matchloader.set_value(true);
   pros::delay(200);
-  chassis.swingToPoint(42, -48, lemlib::DriveSide::LEFT, 800, {.forwards = false, .earlyExitRange=5});
+  chassis.swingToPoint(42, -48, lemlib::DriveSide::LEFT, 800, {.forwards = false, .earlyExitRange = 5});
   chassis.moveToPoint(42, -48, 200, {.forwards = false});
   chassis.swingToHeading(90, lemlib::DriveSide::LEFT, 1100, {});
   pros::delay(800);
   pros::Task scoreTask(score);
   chassis.waitUntilDone();
   chassis.tank(-127, -127);
-  
 }
 
 void six_ball_right()
@@ -428,7 +429,7 @@ void nine_ball_right()
   intake.move(127);
   pros::delay(400);
   blocker.set_value(false);
-  chassis.moveToPoint(55, 46, 1700, {.maxSpeed=55}, false);
+  chassis.moveToPoint(55, 46, 1700, {.maxSpeed = 55}, false);
   chassis.tank(25, 25);
   pros::delay(100);
   chassis.moveToPoint(38, 46, 1200, {.forwards = false});
@@ -456,7 +457,7 @@ void nine_ball_left()
   matchloader.set_value(true);
   intake.move(127);
   pros::delay(400);
-  chassis.moveToPoint(55, -46, 1700, {.maxSpeed=55}, false);
+  chassis.moveToPoint(55, -46, 1700, {.maxSpeed = 55}, false);
   chassis.tank(25, 25);
   pros::delay(100);
   chassis.moveToPoint(38, -46, 1200, {.forwards = false});
@@ -508,24 +509,34 @@ void opcontrol()
     else
       chassis.tank(leftY, rightY);
 
-    if (reverse_toggle)
+    if (master.get_digital(DIGITAL_Y))
     {
-      intake.move(-55);
+      intake.move(-127);
     }
+    else
+    {
+      if (reverse_toggle)
+      {
+        intake.move(-55);
+      }
 
-    if (intake_toggle && !reverse_toggle)
-    {
-      intake.move(127);
-    }
+      if (intake_toggle && !reverse_toggle)
+      {
+        intake.move(127);
+      }
 
-    if (score_intake_toggle){
-      intake.move(-50);
-    } else if (intake_toggle && !reverse_toggle)
-    {
-      intake.move(127);
-    } else if (!reverse_toggle)
-    {
-      intake.move(0);
+      if (score_intake_toggle)
+      {
+        intake.move(-50);
+      }
+      else if (intake_toggle && !reverse_toggle)
+      {
+        intake.move(127);
+      }
+      else if (!reverse_toggle)
+      {
+        intake.move(0);
+      }
     }
 
     matchloader.set_value(matchloader_toggle);
