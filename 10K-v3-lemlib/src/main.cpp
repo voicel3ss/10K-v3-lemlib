@@ -366,7 +366,7 @@ void right_starter()
   chassis.moveToPoint(24, 24, 750, {.earlyExitRange = 3});
   pros::delay(400);
   matchloader.set_value(true);
-  chassis.moveToPoint(12.5, 48.5, 1000);
+  chassis.moveToPoint(12.5, 48.5, 1000, {.maxSpeed=100});
   pros::delay(50);
   matchloader.set_value(false);
   pros::delay(300);
@@ -436,7 +436,7 @@ void six_ball_left()
 void nine_ball_right()
 {
   right_starter();
-  pros::delay(800);
+  pros::delay(870);
   chassis.setPose(27, 47, chassis.getPose().theta);
   matchloader.set_value(true);
   intake.move(127);
