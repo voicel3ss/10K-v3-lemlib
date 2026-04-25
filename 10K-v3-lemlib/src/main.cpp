@@ -64,7 +64,7 @@ enum class Auton
   Right6,
   Right9,
   Right6ML,
-  Right67,
+  Right9Push,
   GoForward,
 };
 
@@ -74,7 +74,7 @@ std::unordered_map<int, Auton> createAutonMap()
       {1, Auton::Right6},
       {2, Auton::Right9},
       {3, Auton::Right6ML},
-      {4, Auton::Right67},
+      {4, Auton::Right9Push},
       {5, Auton::Left6},
       {6, Auton::Left9},
       {7, Auton::GoForward}
@@ -95,7 +95,7 @@ const char *autonToString(Auton auton)
     return "Right Nine";
   case Auton::Right6ML:
     return "Right 6 Matchload";
-  case Auton::Right67:
+  case Auton::Right9Push:
     return "Right Nine Push";
   case Auton::GoForward:
     return "Go Forward";
@@ -106,7 +106,7 @@ const char *autonToString(Auton auton)
 
 std::unordered_map<int, Auton> autonMap = createAutonMap();
 
-int autonCount = 2;
+int autonCount = 4;
 
 void on_left_button()
 {
@@ -384,8 +384,8 @@ void right_starter()
   pros::delay(300);
   matchloader.set_value(true);
   pros::delay(200);
-  chassis.swingToPoint(40, 49, lemlib::DriveSide::RIGHT, 700, {.forwards = false, .earlyExitRange = 5});
-  chassis.moveToPoint(40, 49, 315, {.forwards = false});
+  chassis.swingToPoint(40, 49.5, lemlib::DriveSide::RIGHT, 700, {.forwards = false, .earlyExitRange = 5});
+  chassis.moveToPoint(40, 49.5, 315, {.forwards = false});
   chassis.swingToHeading(90, lemlib::DriveSide::RIGHT, 2000, {.minSpeed=110});
   pros::delay(800);
   pros::Task scoreTask(score);
@@ -413,25 +413,6 @@ void left_starter()
   pros::Task scoreTask(score);
   chassis.waitUntilDone();
   chassis.tank(-127, -127);
-}
-
-void six_seven_ball_right(){
-  wing.set_value(true);
-  intake.move(127);
-  chassis.setPose(45, 6, 270);
-  chassis.moveToPoint(24, 24, 900);
-  pros::delay(400);
-  matchloader.set_value(true);
-  chassis.turnToPoint(61, 51, 800);
-  chassis.moveToPoint(61, 51, 1200);
-  chassis.turnToHeading(90, 700, {}, false);
-  chassis.arcade(50, 0);
-  pros::delay(1000);
-  chassis.arcade(-50, 0);
-  pros::delay(1400);
-  chassis.moveToPoint(22, 50, 2000, {.forwards=false, .minSpeed=70}, false);
-  pros::Task scoreTask(score);
-  pros::delay(2000);
 }
 
 void six_ball_right()
@@ -467,12 +448,12 @@ void six_ball_left()
 void nine_ball_right()
 {
   right_starter();
-  pros::delay(870);
+  pros::delay(670);
   chassis.setPose(27, 47, chassis.getPose().theta);
   matchloader.set_value(true);
   intake.move(127);
   pros::delay(400);
-  chassis.moveToPoint(55, 46, 1900, {.maxSpeed = 45}, false);
+  chassis.moveToPoint(55, 46.5, 1300, {.maxSpeed = 45}, false);
   blocker.set_value(false);
   chassis.tank(25, 25);
   pros::delay(380);
@@ -492,6 +473,17 @@ void nine_ball_right()
   // chassis.turnToHeading(240, 400);
   // chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
 }
+
+void nine_push_right(){
+  nine_ball_right();
+  chassis.moveToPoint(20, 30, 1000, {.forwards=false});
+  wing.set_value(false);
+  chassis.turnToPoint(-10, 37, 800, {});
+  chassis.moveToPoint(-10, 37, 2000);
+  chassis.turnToHeading(240, 400);
+  chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+}
+
 
 void six_ball_matchload_right(){
   right_starter();
@@ -589,8 +581,8 @@ void autonomous()
   case Auton::Right6ML:
     six_ball_matchload_right();
     break;
-  case Auton::Right67:
-    six_seven_ball_right();
+  case Auton::Right9Push:
+    nine_push_right();
   case Auton::GoForward:
     go_forward();
     break;
